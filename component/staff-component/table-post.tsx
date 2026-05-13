@@ -31,16 +31,14 @@ export default function TablePost({postData} : Props){
                 <Table.Content
                     aria-label="Table Posts List">
                 <Table.Header>
-                    <Table.Column isRowHeader>No.</Table.Column>
                     <Table.Column isRowHeader>Title</Table.Column>
                     <Table.Column isRowHeader>Description</Table.Column>
                 </Table.Header>
                 <Table.Body>
                     {paginatedItems.map((t) => (
                         <Table.Row key={t.id} id={t.id}>
-                            <Table.Cell className="bg-primary dark:bg-surface hover:bg-gray-300 dark:hover:bg-tableDark">{t.id}</Table.Cell>
-                            <Table.Cell className="bg-primary dark:bg-surface hover:bg-gray-300 dark:hover:bg-tableDark">{t.title}</Table.Cell>
-                            <Table.Cell className="bg-primary dark:bg-surface hover:bg-gray-300 dark:hover:bg-tableDark">{t.body}</Table.Cell>
+                            <Table.Cell className="bg-primary dark:bg-surface">{t.title}</Table.Cell>
+                            <Table.Cell className="bg-primary dark:bg-surface">{t.body}</Table.Cell>
                         </Table.Row>
                     ))}
                 </Table.Body>

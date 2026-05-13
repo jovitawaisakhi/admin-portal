@@ -10,7 +10,7 @@ export default function HeaderList({icon: Icon, title} : Props){
                 <Icon className="text-foregorund" />
             </div>
 
-            <h2 className="text-xl font-semibold">
+            <h2 className="text-lg md:text-xl font-semibold">
                 {title}
             </h2>
         </div>

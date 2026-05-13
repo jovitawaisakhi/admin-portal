@@ -72,7 +72,7 @@ export default function TableStaff({staff, pageName} : Props){
     const end = Math.min(page * ROWS_PER_PAGE, sortedUsers.length);
 
     return(
-        <div className="mt-5">
+        <div className="hidden md:block mt-5">
             <Table>
                 <Table.ScrollContainer>
                 <Table.Content aria-label="Staff table"
@@ -95,10 +95,10 @@ export default function TableStaff({staff, pageName} : Props){
                     <Table.Body>
                         {displayedItems && displayedItems.map((s) => (
                             <Table.Row key={s.id}>
-                                <Table.Cell className="bg-primary dark:bg-surface hover:bg-gray-300 dark:hover:bg-tableDark">{s.name}</Table.Cell>
-                                <Table.Cell className="bg-primary dark:bg-surface hover:bg-gray-300 dark:hover:bg-tableDark">{s.email}</Table.Cell>
-                                <Table.Cell className="bg-primary dark:bg-surface hover:bg-gray-300 dark:hover:bg-tableDark">{s.website}</Table.Cell>
-                                <Table.Cell className="bg-primary dark:bg-surface hover:bg-gray-300 dark:hover:bg-tableDark">
+                                <Table.Cell className="bg-primary dark:bg-surface">{s.name}</Table.Cell>
+                                <Table.Cell className="bg-primary dark:bg-surface">{s.email}</Table.Cell>
+                                <Table.Cell className="bg-primary dark:bg-surface">{s.website}</Table.Cell>
+                                <Table.Cell className="bg-primary dark:bg-surface">
                                     <div className="flex items-center">
                                         <Link href={`/staff-details/${s.id}`}>
                                             <Info size={16} />

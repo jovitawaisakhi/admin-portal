@@ -7,7 +7,6 @@ export const useToDoQuery = () => {
         queryKey: ["todoList"],
         queryFn: ToDoService.getTodo,
         select: (data: TodoResponse[]) => {
-            console.log(data)
         return data.map(
             (res): Todo => ({
             id: res.id,

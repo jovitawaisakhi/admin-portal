@@ -36,16 +36,14 @@ export default function TableToDo({todoList} : Props){
                 <Table.Content
                     aria-label="Table To Do List">
                 <Table.Header>
-                    <Table.Column isRowHeader>No.</Table.Column>
                     <Table.Column isRowHeader>Title</Table.Column>
                     <Table.Column isRowHeader>Status</Table.Column>
                 </Table.Header>
                 <Table.Body>
                     {paginatedItems.map((t) => (
                         <Table.Row key={t.id} id={t.id}>
-                            <Table.Cell className="bg-primary dark:bg-surface hover:bg-gray-300 dark:hover:bg-tableDark">{t.id}</Table.Cell>
-                            <Table.Cell className="bg-primary dark:bg-surface hover:bg-gray-300 dark:hover:bg-tableDark">{t.title}</Table.Cell>
-                            <Table.Cell className="bg-primary dark:bg-surface hover:bg-gray-300 dark:hover:bg-tableDark">
+                            <Table.Cell className="bg-primary dark:bg-surface">{t.title}</Table.Cell>
+                            <Table.Cell className="bg-primary dark:bg-surface">
                                 <Chip color={statusColorMap[t.status]} size="sm" variant="soft">
                                     {t.status}
                                 </Chip>

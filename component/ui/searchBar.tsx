@@ -7,10 +7,8 @@ export default function SearchBar({
     searchInput: string;
     setSearchInput:  React.Dispatch<React.SetStateAction<string>>,
 }){
-    
-
     return(
-        <div className="w-100">
+        <div className="w-30 md:w-100">
             <SearchField name="search">
                 <SearchField.Group className="dark:bg-surface">
                     <SearchField.SearchIcon />
