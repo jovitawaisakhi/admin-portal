@@ -1,6 +1,12 @@
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
+import StaffDetails from "@/app/staff-details/[id]/page";
+import { useParams } from "next/navigation";
+import { usePostQuery } from "@/api/query/use-post-query";
+import { useAllStaffQuery } from "@/api/query/use-staff-query";
+import { useToDoQuery } from "@/api/query/use-todo-query";
+
 jest.mock("next/navigation", () => ({
   useParams: jest.fn(),
 }));
@@ -17,48 +23,58 @@ jest.mock("@/api/query/use-todo-query", () => ({
   useToDoQuery: jest.fn(),
 }));
 
-jest.mock("@/component/staff-component/staff-table/staff-table", () => ({
+jest.mock("@/component/staff-component/table-staff/staff-info", () => ({
   __esModule: true,
   default: ({ staff }: any) => (
-    <div data-testid="staff-card">{staff.name}</div>
+    <div data-testid="staff-info">
+      {staff.name}
+    </div>
   ),
 }));
 
 jest.mock("@/component/staff-component/table-post", () => ({
   __esModule: true,
   default: ({ postData }: any) => (
-    <div data-testid="table-post">Posts: {postData.length}</div>
+    <div data-testid="table-post">
+      Posts: {postData.length}
+    </div>
   ),
 }));
 
 jest.mock("@/component/staff-component/table-todo", () => ({
   __esModule: true,
   default: ({ todoList }: any) => (
-    <div data-testid="table-todo">Todos: {todoList.length}</div>
+    <div data-testid="table-todo">
+      Todos: {todoList.length}
+    </div>
   ),
 }));
 
 jest.mock("@/component/ui/navbar", () => ({
   __esModule: true,
-  default: () => <div data-testid="navbar">Navbar</div>,
+  default: () => (
+    <div data-testid="navbar">
+      Navbar
+    </div>
+  ),
 }));
 
 jest.mock("@/component/ui/sidebar", () => ({
   __esModule: true,
   default: ({ menu }: any) => (
-    <div data-testid="sidebar">Sidebar - {menu}</div>
+    <div data-testid="sidebar">
+      Sidebar - {menu}
+    </div>
   ),
 }));
 
 jest.mock("@/component/ui/skeleton-load", () => ({
-  SkeletonLoad: () => <div data-testid="skeleton">Loading...</div>,
+  SkeletonLoad: () => (
+    <div data-testid="skeleton">
+      Loading...
+    </div>
+  ),
 }));
-
-import { useParams } from "next/navigation";
-import { usePostQuery } from "@/api/query/use-post-query";
-import { useAllStaffQuery } from "@/api/query/use-staff-query";
-import { useToDoQuery } from "@/api/query/use-todo-query";
-import StaffDetails from "@/app/staff-details/[id]/page";
 
 const mockedUseParams = useParams as jest.Mock;
 const mockedUsePostQuery = usePostQuery as jest.Mock;
@@ -74,164 +90,239 @@ describe("StaffDetails", () => {
     });
   });
 
-  it("renders staff detail correctly", () => {
-    mockedUseAllStaffQuery.mockReturnValue({
-      data: [
-        {
-          id: 1,
-          name: "John Doe",
-        },
-      ],
-      isLoading: false,
-      error: null,
+    it("renders staff detail correctly", () => {
+      mockedUseAllStaffQuery.mockReturnValue({
+        data: [
+          {
+            id: 1,
+            name: "John Doe",
+          },
+        ],
+        isLoading: false,
+        error: null,
+      });
+
+      mockedUsePostQuery.mockReturnValue({
+        data: [
+          {
+            id: 1,
+            userId: 1,
+            title: "Post 1",
+          },
+          {
+            id: 2,
+            userId: 2,
+            title: "Post 2",
+          },
+        ],
+        isLoading: false,
+        error: null,
+      });
+
+      mockedUseToDoQuery.mockReturnValue({
+        data: [
+          {
+            id: 1,
+            userId: 1,
+            title: "Todo 1",
+          },
+          {
+            id: 2,
+            userId: 2,
+            title: "Todo 2",
+          },
+        ],
+        isLoading: false,
+        error: null,
+      });
+
+      render(<StaffDetails />);
+
+      expect(
+        screen.getByTestId("navbar")
+      ).toBeInTheDocument();
+
+      expect(
+        screen.getByTestId("sidebar")
+      ).toBeInTheDocument();
+
+      expect(
+        screen.getByTestId("staff-info")
+      ).toHaveTextContent("John Doe");
+
+      expect(
+        screen.getByTestId("table-post")
+      ).toHaveTextContent("Posts: 1");
+
+      expect(
+        screen.getByTestId("table-todo")
+      ).toHaveTextContent("Todos: 1");
     });
 
-    mockedUsePostQuery.mockReturnValue({
-      data: [
-        {
-          id: 1,
-          userId: 1,
-          title: "Post 1",
-        },
-        {
-          id: 2,
-          userId: 2,
-          title: "Post 2",
-        },
-      ],
-      isLoading: false,
-      error: null,
+    it("shows loading skeleton when post data is loading", () => {
+      mockedUseAllStaffQuery.mockReturnValue({
+        data: [
+          {
+            id: 1,
+            name: "John Doe",
+          },
+        ],
+        isLoading: false,
+        error: null,
+      });
+
+      mockedUsePostQuery.mockReturnValue({
+        data: [],
+        isLoading: true,
+        error: null,
+      });
+
+      mockedUseToDoQuery.mockReturnValue({
+        data: [],
+        isLoading: false,
+        error: null,
+      });
+
+      render(<StaffDetails />);
+
+      expect(
+        screen.getByTestId("skeleton")
+      ).toBeInTheDocument();
     });
 
-    mockedUseToDoQuery.mockReturnValue({
-      data: [
-        {
-          id: 1,
-          userId: 1,
-          title: "Todo 1",
-        },
-        {
-          id: 2,
-          userId: 2,
-          title: "Todo 2",
-        },
-      ],
-      isLoading: false,
-      error: null,
+    it("shows error message when post query fails", () => {
+      mockedUseAllStaffQuery.mockReturnValue({
+        data: [
+          {
+            id: 1,
+            name: "John Doe",
+          },
+        ],
+        isLoading: false,
+        error: null,
+      });
+
+      mockedUsePostQuery.mockReturnValue({
+        data: [],
+        isLoading: false,
+        error: true,
+      });
+
+      mockedUseToDoQuery.mockReturnValue({
+        data: [],
+        isLoading: false,
+        error: null,
+      });
+
+      render(<StaffDetails />);
+
+      expect(
+        screen.getByText("Failed to load post!")
+      ).toBeInTheDocument();
     });
 
-    render(<StaffDetails />);
+    it("shows empty message when no posts exist", () => {
+        mockedUseAllStaffQuery.mockReturnValue({
+          data: [
+            {
+              id: 1,
+              name: "John Doe",
+            },
+          ],
+          isLoading: false,
+          error: null,
+        });
 
-    expect(screen.getByTestId("navbar")).toBeInTheDocument();
-    expect(screen.getByTestId("sidebar")).toBeInTheDocument();
+        mockedUsePostQuery.mockReturnValue({
+          data: [],
+          isLoading: false,
+          error: null,
+        });
 
-    expect(screen.getByTestId("staff-card")).toHaveTextContent(
-      "John Doe"
-    );
+        mockedUseToDoQuery.mockReturnValue({
+          data: [],
+          isLoading: false,
+          error: null,
+        });
 
-    expect(screen.getByTestId("table-post")).toHaveTextContent(
-      "Posts: 1"
-    );
+        render(<StaffDetails />);
 
-    expect(screen.getByTestId("table-todo")).toHaveTextContent(
-      "Todos: 1"
-    );
-  });
-
-  it("shows loading skeleton when post data is loading", () => {
-    mockedUseAllStaffQuery.mockReturnValue({
-      data: [
-        {
-          id: 1,
-          name: "John Doe",
-        },
-      ],
-      isLoading: false,
-      error: null,
+        expect(
+          screen.getByText("This staff has no post!")
+        ).toBeInTheDocument();
     });
 
-    mockedUsePostQuery.mockReturnValue({
-      data: [],
-      isLoading: true,
-      error: null,
+    it("shows empty message when no todos exist", () => {
+        mockedUseAllStaffQuery.mockReturnValue({
+            data: [
+                {
+                    id: 1,
+                    name: "John Doe",
+                },
+            ],
+            isLoading: false,
+            error: null,
+        });
+
+        mockedUsePostQuery.mockReturnValue({
+            data: [
+                {
+                    id: 1,
+                    userId: 1,
+                    title: "Post 1",
+                },
+            ],
+            isLoading: false,
+            error: null,
+        });
+
+        mockedUseToDoQuery.mockReturnValue({
+            data: [],
+            isLoading: false,
+            error: null,
+        });
+
+        render(<StaffDetails />);
+
+        expect(
+            screen.getByText("This staff has no task to do!")
+        ).toBeInTheDocument();
     });
 
-    mockedUseToDoQuery.mockReturnValue({
-      data: [],
-      isLoading: false,
-      error: null,
+    it("shows error message when todo query fails", () => {
+      mockedUseAllStaffQuery.mockReturnValue({
+        data: [
+          {
+            id: 1,
+            name: "John Doe",
+          },
+        ],
+        isLoading: false,
+        error: null,
+      });
+
+      mockedUsePostQuery.mockReturnValue({
+        data: [
+          {
+            id: 1,
+            userId: 1,
+            title: "Post 1",
+          },
+        ],
+        isLoading: false,
+        error: null,
+      });
+
+      mockedUseToDoQuery.mockReturnValue({
+        data: [],
+        isLoading: false,
+        error: true,
+      });
+
+      render(<StaffDetails />);
+
+      expect(
+        screen.getByText("Failed to load task!")
+      ).toBeInTheDocument();
     });
-
-    render(<StaffDetails />);
-
-    expect(screen.getByTestId("skeleton")).toBeInTheDocument();
-  });
-
-  it("shows empty message when no posts exist", () => {
-    mockedUseAllStaffQuery.mockReturnValue({
-      data: [
-        {
-          id: 1,
-          name: "John Doe",
-        },
-      ],
-      isLoading: false,
-      error: null,
-    });
-
-    mockedUsePostQuery.mockReturnValue({
-      data: [],
-      isLoading: false,
-      error: null,
-    });
-
-    mockedUseToDoQuery.mockReturnValue({
-      data: [],
-      isLoading: false,
-      error: null,
-    });
-
-    render(<StaffDetails />);
-
-    expect(
-      screen.getByText("This staff has no post!")
-    ).toBeInTheDocument();
-  });
-
-  it("shows empty message when no todos exist", () => {
-    mockedUseAllStaffQuery.mockReturnValue({
-      data: [
-        {
-          id: 1,
-          name: "John Doe",
-        },
-      ],
-      isLoading: false,
-      error: null,
-    });
-
-    mockedUsePostQuery.mockReturnValue({
-      data: [
-        {
-          id: 1,
-          userId: 1,
-          title: "Post 1",
-        },
-      ],
-      isLoading: false,
-      error: null,
-    });
-
-    mockedUseToDoQuery.mockReturnValue({
-      data: [],
-      isLoading: false,
-      error: null,
-    });
-
-    render(<StaffDetails />);
-
-    expect(
-      screen.getByText("This staff has no task to do!")
-    ).toBeInTheDocument();
-  });
 });

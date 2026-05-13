@@ -57,13 +57,13 @@ export default function AllStaff() {
                     )}
 
                     {error && (
-                        <p>Failed to load staff.</p>
+                        <p>Failed to load staff!</p>
                     )}
 
                     {!isLoading &&
                         !error &&
                         searchData.length === 0 && (
-                            <p>No staff found.</p>
+                            <p>No staff found!</p>
                         )}
 
                     {!isLoading &&

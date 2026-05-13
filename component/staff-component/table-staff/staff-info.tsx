@@ -7,13 +7,13 @@ interface Props{
     staff: StaffResponse
 }
 
-export default function StaffTable({staff} : Props){
+export default function StaffInfo({staff} : Props){
     return(
         <div className="mb-5">
             <div className="flex items-center space-x-5 p-4 mb-5 rounded-xl shadow-sm bg-primary">
                 <CircleUser className="hidden md:block lg:w-40 lg:h-40 text-foreground/85" />
                 <div className="flex flex-col justify-between">
-                    <div>
+                    <div className="lg:mb-5">
                         <p className="font-bold text-xl">{staff.name}</p>
 
                         <div className="flex items-center">

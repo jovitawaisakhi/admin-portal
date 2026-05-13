@@ -3,7 +3,6 @@
 import { usePostQuery } from "@/api/query/use-post-query";
 import { useAllStaffQuery } from "@/api/query/use-staff-query";
 import { useToDoQuery } from "@/api/query/use-todo-query";
-import StaffTable from "@/component/staff-component/table-staff/staff-table";
 import TablePost from "@/component/staff-component/table-post";
 import TableToDo from "@/component/staff-component/table-todo";
 import NavBar from "@/component/ui/navbar";
@@ -11,12 +10,13 @@ import SideBar from "@/component/ui/sidebar";
 import { SkeletonLoad } from "@/component/ui/skeleton-load";
 import { useParams } from "next/navigation";
 import React, { useState } from "react";
+import StaffInfo from "@/component/staff-component/table-staff/staff-info";
 
 export default function StaffDetails(){
     const currentStaffID = useParams();
-    const { data: toDoData, isLoading: isLoadingToDo, error: toDoError } = useToDoQuery();
-    const { data: postData, isLoading: isLoadingPost, error: postError } = usePostQuery();
-    const { data: allStaffData, isLoading: isLoadingAllStaff, error: allStaffErr } = useAllStaffQuery();
+    const { data: toDoData, isLoading: isLoadingToDo, error: errToDo } = useToDoQuery();
+    const { data: postData, isLoading: isLoadingPost, error: errPost } = usePostQuery();
+    const { data: allStaffData, isLoading: isLoadingAllStaff, error: errAllStaff } = useAllStaffQuery();
 
     const [open, setOpen] = useState<boolean>(false);
 
@@ -40,11 +40,13 @@ export default function StaffDetails(){
                 <NavBar open={open} setOpen={setOpen}/>
                 <div className="m-6">
                     {currentData && (
-                        <StaffTable staff={currentData[0]}/>
+                        <StaffInfo staff={currentData[0]}/>
                     )}
                     <div className="space-y-2 mb-5">
                         <p className="text-xl font-bold mb-2">Post List</p>
-                        {isLoadingPost ? (
+                        {errPost ? (
+                            <p>Failed to load post!</p>
+                        ) : isLoadingPost ? (
                             <SkeletonLoad/>
                         ) : filteredPostData.length > 0 ? (
                             <TablePost postData={filteredPostData}/>
@@ -55,7 +57,9 @@ export default function StaffDetails(){
 
                     <div className="space-y-2">
                         <p className="text-xl font-bold mb-2">To Do List</p>
-                        {isLoadingToDo ? (
+                        {errToDo ? (
+                            <p>Failed to load task!</p>
+                        ) : isLoadingToDo ? (
                             <SkeletonLoad/>
                         ) : filteredToDoData.length > 0 ? (
                             <TableToDo todoList={filteredToDoData}/>

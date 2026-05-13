@@ -59,13 +59,13 @@ export default function Home() {
                         )}
 
                         {errAllStaff && (
-                            <p>Failed to load staff.</p>
+                            <p>Failed to load staff!</p>
                         )}
 
                         {!isLoadingAllStaff &&
                             !errAllStaff &&
                             searchData.length === 0 && (
-                                <p>No staff found.</p>
+                                <p>No staff found!</p>
                             )}
 
                         {!isLoadingAllStaff &&

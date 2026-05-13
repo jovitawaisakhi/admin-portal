@@ -1,5 +1,5 @@
 import { StaffResponse } from "@/types/staff";
-import {Avatar, Card} from "@heroui/react";
+import {Card} from "@heroui/react";
 import { Globe, Info } from "lucide-react";
 import Link from "next/link";
 
