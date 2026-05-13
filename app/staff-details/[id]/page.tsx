@@ -1,7 +1,9 @@
 "use client";
 
 import { usePostQuery } from "@/api/query/use-post-query";
+import { useAllStaffQuery } from "@/api/query/use-staff-query";
 import { useToDoQuery } from "@/api/query/use-todo-query";
+import StaffCard from "@/component/staff-component/staff-card/staff-card";
 import TablePost from "@/component/staff-component/table-post";
 import TableToDo from "@/component/staff-component/table-todo";
 import NavBar from "@/component/ui/navbar";
@@ -13,6 +15,9 @@ export default function StaffDetails(){
     const currentStaffID = useParams();
     const { data: toDoData, isLoading: toDoLoading, error: toDoError } = useToDoQuery();
     const { data: postData, isLoading: postLoading, error: postError } = usePostQuery();
+    const { data: allStaffData, isLoading: allStaffLoad, error: allStaffErr } = useAllStaffQuery();
+
+    const currentData = allStaffData?.filter((item) => item.id === Number(currentStaffID.id));
 
     const filteredToDoData = React.useMemo(() => {
         if (!toDoData) return [];
@@ -28,11 +33,14 @@ export default function StaffDetails(){
 
     return(
         <div className="flex">
-            <SideBar menu=""/>
+            <SideBar menu="All Staff"/>
 
             <div className="w-full">
                 <NavBar/>
                 <div className="m-6 space-y-5">
+                    {currentData && (
+                        <StaffCard staff={currentData[0]}/>
+                    )}
                     <div className="space-y-2">
                         <p className="text-lg font-bold">To Do List</p>
                         {filteredToDoData.length > 0 ? (

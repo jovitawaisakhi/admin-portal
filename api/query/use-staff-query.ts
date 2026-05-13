@@ -1,9 +1,9 @@
-import { Staff } from "@/types/staff"
 import { useQuery } from "@tanstack/react-query"
 import { StaffService } from "../service/staff-service"
+import { StaffResponse } from "@/types/staff"
 
 export const useAllStaffQuery = () => {
-    return useQuery<Staff[]>({
+    return useQuery<StaffResponse[]>({
         queryKey: ["allStaff"],
         queryFn: StaffService.getAllStaff,
         meta: {

@@ -1,51 +1,100 @@
-import { Staff } from "@/types/staff";
-import { Pagination, Table } from "@heroui/react";
-import { Info } from "lucide-react";
+import { StaffResponse } from "@/types/staff";
+import { cn, Pagination, SortDescriptor, Table } from "@heroui/react";
+import { ArrowDown, Info } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 interface Props{
-    staff: Staff[],
+    staff: StaffResponse[],
     pageName: string,
 }
+
+function SortableColumnHeader({
+    children,
+    sortDirection,
+}: {
+    children: React.ReactNode;
+    sortDirection?: "ascending" | "descending";
+}) {
+return (
+    <span className="flex items-center justify-between">
+    {children}
+    {!!sortDirection && (
+        <ArrowDown className={cn(
+            "size-3 transform transition-transform duration-100 ease-out",
+            sortDirection === "descending" ? "rotate-180" : "",
+        )}/>
+    )}
+    </span>
+);
+};
 
 export default function TableStaff({staff, pageName} : Props){
     const ROWS_PER_PAGE = 5;
     const enablePagination = pageName === "Dashboard";
-    const [page, setPage] = useState<number>(1);
-    const totalPages = Math.ceil(staff.length / ROWS_PER_PAGE);
-    const pages = Array.from({length: totalPages}, (_, i) => i + 1);
-    const paginatedItems = useMemo(() => {
-        if (!enablePagination) return staff;
 
-        const start = (page - 1) * ROWS_PER_PAGE;
-        return staff.slice(start, start + ROWS_PER_PAGE);
-    }, [page, staff, enablePagination]);
-    const start = (page - 1) * ROWS_PER_PAGE + 1;
-    const end = Math.min(page * ROWS_PER_PAGE, staff.length);
+    const [page, setPage] = useState<number>(1);
+    const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
+        column: "name",
+        direction: "ascending",
+    });
+
+    const sortedUsers = useMemo(() => {
+        return [...staff].sort((a, b) => {
+        const col = sortDescriptor.column as keyof StaffResponse;
+        const first = String(a[col] ?? "");
+        const second = String(b[col] ?? "");
+        let cmp = first.localeCompare(second);
+        if (sortDescriptor.direction === "descending") {
+            cmp *= -1;
+        }
+        return cmp;
+        });
+    }, [staff, sortDescriptor]);
+
+    const totalPages = Math.max(1, Math.ceil(sortedUsers.length / ROWS_PER_PAGE));
 
     useEffect(() => {
         if (page > totalPages) {
             setPage(1);
         }
-    }, [staff, totalPages]);
+    }, [page, totalPages]);
+
+    const displayedItems = useMemo(() => {
+        if (!enablePagination) return sortedUsers;
+
+        const start = (page - 1) * ROWS_PER_PAGE;
+        return sortedUsers.slice(start, start + ROWS_PER_PAGE);
+    }, [page, sortedUsers, enablePagination]);
+
+    const pages = Array.from({length: totalPages}, (_, i) => i + 1);
+    const start = (page - 1) * ROWS_PER_PAGE + 1;
+    const end = Math.min(page * ROWS_PER_PAGE, sortedUsers.length);
 
     return(
         <div className="mt-5">
-            <Table className="bg-primary">
+            <Table>
                 <Table.ScrollContainer>
-                <Table.Content aria-label="Staff table">
+                <Table.Content aria-label="Staff table"
+                    sortDescriptor={sortDescriptor}
+                    onSortChange={setSortDescriptor}>
                     <Table.Header>
-                        <Table.Column isRowHeader>No.</Table.Column>
-                        <Table.Column isRowHeader>Name</Table.Column>
-                        <Table.Column isRowHeader>Email</Table.Column>
+                        <Table.Column isRowHeader allowsSorting id="name">
+                            {({sortDirection}) => (
+                                <SortableColumnHeader sortDirection={sortDirection}>Name</SortableColumnHeader>
+                            )}
+                        </Table.Column>
+                        <Table.Column isRowHeader allowsSorting id="email">
+                            {({sortDirection}) => (
+                                <SortableColumnHeader sortDirection={sortDirection}>Email</SortableColumnHeader>
+                            )}
+                        </Table.Column>
                         <Table.Column isRowHeader>Website</Table.Column>
                         <Table.Column isRowHeader>Action</Table.Column>
                     </Table.Header>
-                    <Table.Body items={paginatedItems}>
-                        {paginatedItems && paginatedItems.map((s) => (
+                    <Table.Body>
+                        {displayedItems && displayedItems.map((s) => (
                             <Table.Row key={s.id}>
-                                <Table.Cell className="bg-primary dark:bg-surface hover:bg-gray-300 dark:hover:bg-tableDark">{s.id}</Table.Cell>
                                 <Table.Cell className="bg-primary dark:bg-surface hover:bg-gray-300 dark:hover:bg-tableDark">{s.name}</Table.Cell>
                                 <Table.Cell className="bg-primary dark:bg-surface hover:bg-gray-300 dark:hover:bg-tableDark">{s.email}</Table.Cell>
                                 <Table.Cell className="bg-primary dark:bg-surface hover:bg-gray-300 dark:hover:bg-tableDark">{s.website}</Table.Cell>

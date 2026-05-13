@@ -1,9 +1,9 @@
 import axiosClient from "@/lib/axios-client";
-import { Staff } from "@/types/staff";
+import { StaffResponse } from "@/types/staff";
 
 export const StaffService = {
-    getAllStaff: async (): Promise<Staff[]> => {
-        const response = await axiosClient.get<Staff[]>(
+    getAllStaff: async (): Promise<StaffResponse[]> => {
+        const response = await axiosClient.get<StaffResponse[]>(
             "/users",
             {}
         )
